@@ -16,8 +16,14 @@ public class TaskList {
         idCounter++;
     }
 
-    public ArrayList<Task> listTasks() {
-        return this.tasks;
+    public void listTasks() {
+        if (tasks.isEmpty()) {
+            System.out.println("There are no tasks in the list.");
+            return;
+        }
+        for (Task task: tasks) {
+            System.out.println(task.getId() + "\n" + task.getDescription() + "\n" + task.getStatus() + "\n" );
+        }
     }
 
     private ArrayList<Task> listTasksByStatus(Status status) {
@@ -30,7 +36,16 @@ public class TaskList {
         return filteredByStatus;
     }
 
-    private void updateTaskStatus(int id, Status updatedStatus) {
+    public void updateTask(int id, String description) {
+        for ( Task task: tasks) {
+            if ( task.getId() == id) {
+                task.setDescription(description);
+                System.out.println("Task updated successfully");
+            }
+        }
+    }
+
+    public void updateTaskStatus(int id, Status updatedStatus) {
         for( Task task: tasks) {
             if (task.getId() == id) {
                 task.setStatus(updatedStatus);
@@ -39,7 +54,7 @@ public class TaskList {
         }
     }
 
-    private void deleteTask(int id) {
+    public void deleteTask(int id) {
         for (Task task: tasks) {
             if (task.getId() == id) {
                 tasks.remove(task);
