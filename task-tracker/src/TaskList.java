@@ -37,10 +37,18 @@ public class TaskList {
     }
 
     public void updateTask(int id, String description) {
+        // Edge case: Empty task list
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks in the list");
+        }
+
         for ( Task task: tasks) {
             if ( task.getId() == id) {
                 task.setDescription(description);
                 System.out.println("Task updated successfully");
+            }
+            else {
+                System.out.println("Task with id" + id + "does not exist");
             }
         }
     }
@@ -55,6 +63,17 @@ public class TaskList {
     }
 
     public void deleteTask(int id) {
+        // Edge case: If the list is empty
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks in the list.");
+        }
+
+        // Edge case: If there is only task in the list
+        if (tasks.size() == 1) {
+            tasks.remove(0);
+            System.out.println("Task deleted successfully");
+        }
+
         for (Task task: tasks) {
             if (task.getId() == id) {
                 tasks.remove(task);

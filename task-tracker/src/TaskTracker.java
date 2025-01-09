@@ -26,33 +26,45 @@ public class TaskTracker {
             // Check for cases where command is valid
             switch (command) {
                 case "add":
-                    for (int i=1; i<parts.length; i++) {
-                        String formatted = parts[i] + " ";
-                        instruction += formatted;
+                    if (parts.length > 1) {
+                        for (int i = 1; i < parts.length; i++) {
+                            String formatted = parts[i] + " ";
+                            instruction += formatted;
+                        }
+                        taskList.addTask(instruction);
+                    } else {
+                        System.out.println("Please provide a description");
                     }
-                    taskList.addTask(instruction);
                     break;
                 case "list":
                     taskList.listTasks();
                     break;
                 case "update":
-                    if (isInteger(parts[1])) {
-                        int taskId = Integer.parseInt(parts[1]);
-                        for (int i=2; i<parts.length; i++) {
-                            String formatted = parts[i] + " ";
-                            instruction += formatted;
+                    if (parts.length > 1) {
+                        if (isInteger(parts[1])) {
+                            int taskId = Integer.parseInt(parts[1]);
+                            for (int i=2; i<parts.length; i++) {
+                                String formatted = parts[i] + " ";
+                                instruction += formatted;
+                            }
+                            taskList.updateTask(taskId, instruction);
+                        } else {
+                            System.out.println("Please enter a valid id.");
                         }
-                        taskList.updateTask(taskId, instruction);
                     } else {
-                        System.out.println("Please enter a valid id.");
+                        System.out.println("Please provide task id and description");
                     }
                     break;
                 case "delete":
-                    if (isInteger(parts[1])) {
-                        int taskId = Integer.parseInt(parts[1]);
-                        taskList.deleteTask(taskId);
+                    if (parts.length > 1) {
+                        if (isInteger(parts[1])) {
+                            int taskId = Integer.parseInt(parts[1]);
+                            taskList.deleteTask(taskId);
+                        } else {
+                            System.out.println("Please enter a valid id.");
+                        }
                     } else {
-                        System.out.println("Please enter a valid id.");
+                        System.out.println("Please provide task id");
                     }
                     break;
                 default:
