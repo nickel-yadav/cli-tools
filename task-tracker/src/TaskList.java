@@ -26,14 +26,24 @@ public class TaskList {
         }
     }
 
-    private ArrayList<Task> listTasksByStatus(Status status) {
+    public void listTasksByStatus(String status) {
         ArrayList<Task> filteredByStatus = new ArrayList<Task>();
+        Status currentStatus = Status.PENDING;
+        currentStatus = switch (status) {
+            case "done" -> Status.COMPLETE;
+            case "in-progress" -> Status.ONGOING;
+            default -> currentStatus;
+        };
         for (Task currentTask : tasks) {
-            if (currentTask.getStatus() == status) {
+            if (currentTask.getStatus() == currentStatus) {
                 filteredByStatus.add(currentTask);
             }
         }
-        return filteredByStatus;
+
+        for (Task task : filteredByStatus) {
+            System.out.println(task.getId() + "\n" + task.getDescription() + "\n" + task.getStatus() + "\n" );
+        }
+
     }
 
     public void updateTask(int id, String description) {
@@ -46,9 +56,6 @@ public class TaskList {
             if ( task.getId() == id) {
                 task.setDescription(description);
                 System.out.println("Task updated successfully");
-            }
-            else {
-                System.out.println("Task with id" + id + "does not exist");
             }
         }
     }

@@ -37,13 +37,18 @@ public class TaskTracker {
                     }
                     break;
                 case "list":
-                    taskList.listTasks();
+                    if (parts.length > 1) {
+                        taskList.listTasksByStatus(parts[1]);
+                    }
+                    else {
+                        taskList.listTasks();
+                    }
                     break;
                 case "update":
                     if (parts.length > 1) {
                         if (isInteger(parts[1])) {
                             int taskId = Integer.parseInt(parts[1]);
-                            for (int i=2; i<parts.length; i++) {
+                            for (int i=1; i<parts.length; i++) {
                                 String formatted = parts[i] + " ";
                                 instruction += formatted;
                             }
@@ -65,6 +70,22 @@ public class TaskTracker {
                         }
                     } else {
                         System.out.println("Please provide task id");
+                    }
+                    break;
+                case "mark-in-progress":
+                    if (parts.length > 1) {
+                        if (isInteger(parts[1])) {
+                            int taskId = Integer.parseInt(parts[1]);
+                            taskList.updateTaskStatus(taskId, Status.ONGOING);
+                        }
+                    }
+                    break;
+                case "mark-done":
+                    if (parts.length > 1) {
+                        if (isInteger(parts[1])) {
+                            int taskId = Integer.parseInt(parts[1]);
+                            taskList.updateTaskStatus(taskId, Status.COMPLETE);
+                        }
                     }
                     break;
                 default:
