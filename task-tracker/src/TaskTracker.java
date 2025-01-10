@@ -1,99 +1,84 @@
-import java.util.Scanner;
-
 public class TaskTracker {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        if (args.length == 0) {
+            System.out.println("Usage:<command> [arguments...]");
+            return;
+        }
+
         TaskList taskList = new TaskList();
         System.out.println("Welcome to task tracker \n");
         System.out.println("Enter a command (type 'exit' to quit):");
-        while (true) {
-            // Take user input
-            System.out.println("> ");
-            String input = scanner.nextLine().trim();
 
-            // Check for edge case - user wants to exit
-            if (input.equalsIgnoreCase("exit")) {
-                System.out.println("Goodbye !");
-                break;
-            }
-
-            // Split the input into command and instruction
-            String[] parts = input.split(" ");
-            String command = parts[0];
-            String instruction = "";
-
-
-            // Check for cases where command is valid
-            switch (command) {
-                case "add":
-                    if (parts.length > 1) {
-                        for (int i = 1; i < parts.length; i++) {
-                            String formatted = parts[i] + " ";
-                            instruction += formatted;
-                        }
-                        taskList.addTask(instruction);
-                    } else {
-                        System.out.println("Please provide a description");
-                    }
-                    break;
-                case "list":
-                    if (parts.length > 1) {
-                        taskList.listTasksByStatus(parts[1]);
-                    }
-                    else {
-                        taskList.listTasks();
-                    }
-                    break;
-                case "update":
-                    if (parts.length > 1) {
-                        if (isInteger(parts[1])) {
-                            int taskId = Integer.parseInt(parts[1]);
-                            for (int i=1; i<parts.length; i++) {
-                                String formatted = parts[i] + " ";
-                                instruction += formatted;
-                            }
-                            taskList.updateTask(taskId, instruction);
-                        } else {
-                            System.out.println("Please enter a valid id.");
-                        }
-                    } else {
-                        System.out.println("Please provide task id and description");
-                    }
-                    break;
-                case "delete":
-                    if (parts.length > 1) {
-                        if (isInteger(parts[1])) {
-                            int taskId = Integer.parseInt(parts[1]);
-                            taskList.deleteTask(taskId);
-                        } else {
-                            System.out.println("Please enter a valid id.");
-                        }
-                    } else {
-                        System.out.println("Please provide task id");
-                    }
-                    break;
-                case "mark-in-progress":
-                    if (parts.length > 1) {
-                        if (isInteger(parts[1])) {
-                            int taskId = Integer.parseInt(parts[1]);
-                            taskList.updateTaskStatus(taskId, Status.ONGOING);
-                        }
-                    }
-                    break;
-                case "mark-done":
-                    if (parts.length > 1) {
-                        if (isInteger(parts[1])) {
-                            int taskId = Integer.parseInt(parts[1]);
-                            taskList.updateTaskStatus(taskId, Status.COMPLETE);
-                        }
-                    }
-                    break;
-                default:
-                    System.out.println("Unknown command");
-                    break;
-            }
+        // Split the input into command and arguments
+        String command = args[0];
+        String[] commandArgs = java.util.Arrays.copyOfRange(args, 1, args.length);
+        // Check for edge case - user wants to exit
+        if (command.equalsIgnoreCase("exit")) {
+            System.out.println("Goodbye !");
+            return;
         }
-        scanner.close();
+
+        // Check for cases where command is valid
+        switch (command) {
+            case "add":
+                if (commandArgs.length > 0) {
+                    taskList.addTask(String.join(" ", commandArgs));
+                } else {
+                    System.out.println("Please provide a description");
+                }
+                break;
+            case "list":
+                if (commandArgs.length > 0) {
+                    taskList.listTasksByStatus(commandArgs[0]);
+                }
+                else {
+                    taskList.listTasks();
+                }
+                break;
+            case "update":
+                if (commandArgs.length > 0) {
+                    if (isInteger(commandArgs[0])) {
+                        int taskId = Integer.parseInt(commandArgs[0]);
+                        taskList.updateTask(taskId, String.join(" ", commandArgs[1]));
+                    } else {
+                        System.out.println("Please enter a valid id.");
+                    }
+                } else {
+                    System.out.println("Please provide task id and description");
+                }
+                break;
+            case "delete":
+                if (commandArgs.length > 1) {
+                    if (isInteger(commandArgs[0])) {
+                        int taskId = Integer.parseInt(commandArgs[0]);
+                        taskList.deleteTask(taskId);
+                    } else {
+                        System.out.println("Please enter a valid id.");
+                    }
+                } else {
+                    System.out.println("Please provide task id");
+                }
+                break;
+            case "mark-in-progress":
+                if (commandArgs.length > 0) {
+                    if (isInteger(commandArgs[0])) {
+                        int taskId = Integer.parseInt(commandArgs[0]);
+                        taskList.updateTaskStatus(taskId, Status.ONGOING);
+                    }
+                }
+                break;
+            case "mark-done":
+                if (commandArgs.length > 0) {
+                    if (isInteger(commandArgs[0])) {
+                        int taskId = Integer.parseInt(commandArgs[0]);
+                        taskList.updateTaskStatus(taskId, Status.COMPLETE);
+                    }
+                }
+                break;
+            default:
+                System.out.println("Unknown command");
+                break;
+        }
     }
 
     public static boolean isInteger(String str) {
