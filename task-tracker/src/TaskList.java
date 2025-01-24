@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class TaskList {
     private File tasks;
@@ -61,107 +60,68 @@ public class TaskList {
         }
     }
 
-
     public void listTasks() {
+        processTasks((task) -> true); // Process all tasks
+    }
+
+    public void listTasksByStatus(String status) {
+        processTasks((task) -> task.has("status") && task.getString("status").equalsIgnoreCase(status));
+    }
+
+    private void processTasks(TaskProcessor processor) {
         if (tasks.length() == 0) {
             System.out.println("There are no tasks in the list.");
             return;
         }
         try (FileReader fileReader = new FileReader(tasks.getAbsolutePath())) {
-            StringBuilder fileContent = new StringBuilder();
-            int i;
-            while((i = fileReader.read()) != -1) {
-                fileContent.append((char) i);
-            }
-            String jsonString = fileContent.toString().trim();
+            String jsonString = readFile(fileReader);
             if (jsonString.startsWith("[")) {
                 JSONArray jsonArray = new JSONArray(jsonString);
-                iterateOverArray(jsonArray);
-            } else if  (jsonString.startsWith("{")) {
+                processJSONArray(jsonArray, processor);
+            } else if (jsonString.startsWith("{")) {
                 JSONObject jsonObject = new JSONObject(jsonString);
-                iterateOverObject(jsonObject);
+                processJSONObject(jsonObject, processor);
             } else {
                 System.out.println("Invalid JSON format");
             }
         } catch (IOException e) {
-            System.out.println("Error reading the JSON file" + e.getMessage());
+            System.out.println("Error reading the JSON file: " + e.getMessage());
         }
     }
 
-    private static void iterateOverArray(JSONArray jsonArray) {
+    private String readFile(FileReader fileReader) throws IOException {
+        StringBuilder fileContent = new StringBuilder();
+        int i;
+        while ((i = fileReader.read()) != -1) {
+            fileContent.append((char) i);
+        }
+        return fileContent.toString().trim();
+    }
+
+    private void processJSONArray(JSONArray jsonArray, TaskProcessor processor) {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
-            System.out.println("Object " + (i + 1) + ": " + obj);
+            if (processor.shouldProcess(obj)) {
+                System.out.println("Task " + (i + 1) + ": " + obj);
+            }
         }
     }
 
-    private static void iterateOverObject(JSONObject jsonObject) {
+    private void processJSONObject(JSONObject jsonObject, TaskProcessor processor) {
         for (String key : jsonObject.keySet()) {
-            Object value = jsonObject.get(key);
-            System.out.println("Key: " + key + ", Value: " + value);
-        }
-    }
-
-    public void listTasksByStatus(String status) {
-        ArrayList<Task> filteredByStatus = new ArrayList<Task>();
-        Status currentStatus = Status.PENDING;
-        currentStatus = switch (status) {
-            case "done" -> Status.COMPLETE;
-            case "in-progress" -> Status.ONGOING;
-            default -> currentStatus;
-        };
-        for (Task currentTask : tasks) {
-            if (currentTask.getStatus() == currentStatus) {
-                filteredByStatus.add(currentTask);
-            }
-        }
-
-        for (Task task : filteredByStatus) {
-            System.out.println(task.getId() + "\n" + task.getDescription() + "\n" + task.getStatus() + "\n" );
-        }
-
-    }
-
-    public void updateTask(int id, String description) {
-        // Edge case: Empty task list
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks in the list");
-        }
-
-        for ( Task task: tasks) {
-            if ( task.getId() == id) {
-                task.setDescription(description);
-                System.out.println("Task updated successfully");
+            JSONObject obj = jsonObject.getJSONObject(key);
+            if (processor.shouldProcess(obj)) {
+                System.out.println("Key: " + key + ", Task: " + obj);
             }
         }
     }
 
-    public void updateTaskStatus(int id, Status updatedStatus) {
-        for( Task task: tasks) {
-            if (task.getId() == id) {
-                task.setStatus(updatedStatus);
-                System.out.println("Status updated successfully");
-            }
-        }
+    // Functional interface for processing tasks
+    @FunctionalInterface
+    interface TaskProcessor {
+        boolean shouldProcess(JSONObject task);
     }
 
-    public void deleteTask(int id) {
-        // Edge case: If the list is empty
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks in the list.");
-        }
 
-        // Edge case: If there is only task in the list
-        if (tasks.size() == 1) {
-            tasks.remove(0);
-            System.out.println("Task deleted successfully");
-        }
 
-        for (Task task: tasks) {
-            if (task.getId() == id) {
-                tasks.remove(task);
-                System.out.println("Task deleted successfully");
-            }
-        }
-    }
 }

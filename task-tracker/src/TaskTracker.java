@@ -35,46 +35,6 @@ public class TaskTracker {
                     taskList.listTasks();
                 }
                 break;
-            case "update":
-                if (commandArgs.length > 0) {
-                    if (isInteger(commandArgs[0])) {
-                        int taskId = Integer.parseInt(commandArgs[0]);
-                        taskList.updateTask(taskId, String.join(" ", commandArgs[1]));
-                    } else {
-                        System.out.println("Please enter a valid id.");
-                    }
-                } else {
-                    System.out.println("Please provide task id and description");
-                }
-                break;
-            case "delete":
-                if (commandArgs.length > 1) {
-                    if (isInteger(commandArgs[0])) {
-                        int taskId = Integer.parseInt(commandArgs[0]);
-                        taskList.deleteTask(taskId);
-                    } else {
-                        System.out.println("Please enter a valid id.");
-                    }
-                } else {
-                    System.out.println("Please provide task id");
-                }
-                break;
-            case "mark-in-progress":
-                if (commandArgs.length > 0) {
-                    if (isInteger(commandArgs[0])) {
-                        int taskId = Integer.parseInt(commandArgs[0]);
-                        taskList.updateTaskStatus(taskId, Status.ONGOING);
-                    }
-                }
-                break;
-            case "mark-done":
-                if (commandArgs.length > 0) {
-                    if (isInteger(commandArgs[0])) {
-                        int taskId = Integer.parseInt(commandArgs[0]);
-                        taskList.updateTaskStatus(taskId, Status.COMPLETE);
-                    }
-                }
-                break;
             default:
                 System.out.println("Unknown command");
                 break;
